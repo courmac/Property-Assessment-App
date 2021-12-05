@@ -20,6 +20,9 @@ public class ApiPropertyAssessmentDAO implements PropertyAssessmentDAO {
     private String source = "https://data.edmonton.ca/resource/q7d6-ambg.csv";
     private boolean getLess = false;
     private int offsetSize = 10000;
+    private boolean concurrentMode = false;
+    private int concurrentoffset;
+    private int concurrentlimit;
 
 
     /**
@@ -68,6 +71,55 @@ public class ApiPropertyAssessmentDAO implements PropertyAssessmentDAO {
         this.setOffsetSize(10000);
         getLess = false;
         return soqlQueryToPropertyAssessments(source + "?");
+    }
+
+    /**
+     * this method returns the entire city of edmonton property assesments database
+     * in it's current format will take a while to complete
+     * @return the PropertyAssessments object of entire database
+     */
+
+    public PropertyAssessments getAllConcurrent(int limit, int offset) {
+        PropertyAssessments propertyList = new PropertyAssessments();
+        String loopQurey = source + "?" + "&$limit=" + limit + "&$offset=" + offset;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(loopQurey)).GET().build();
+
+
+        String[] propArrayResponse = null;
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            //spits the response into a String array where each element is its own property assessment
+            propArrayResponse = response.body().split("\n");
+
+            //since the first line is the data headers if only one line was returned there was no data in the query
+            // if no data is returned from the query returns null
+            int entries = propArrayResponse.length;
+            if (entries == 1) return new PropertyAssessments();
+
+            PropertyAssessments propertyListChunk = new PropertyAssessments();
+
+            // iterates through the propArrayResponse and splits each index into a string array for the
+            // PropertyAssessment constructor
+            for (int i = 1; i < entries; i++) {
+
+                // formats the response into string array for the PropertyAssessment constructor
+                String prop = propArrayResponse[i].replace("\"", "");
+                String[] property = prop.split(",", -1);
+
+                propertyListChunk.add(new PropertyAssessment(property));
+            }
+
+            // adds this offset's propertyListChunk to the rest of the propertyList
+            propertyList.combine(propertyListChunk);
+
+        } catch(IOException | InterruptedException e){
+            e.printStackTrace();
+        }
+
+        return propertyList;
     }
 
     /**
@@ -141,8 +193,11 @@ public class ApiPropertyAssessmentDAO implements PropertyAssessmentDAO {
 
                     propertyListChunk.add(new PropertyAssessment(property));
                 }
+
                 // adds this offset's propertyListChunk to the rest of the propertyList
                 propertyList.combine(propertyListChunk);
+
+                if(concurrentMode) return propertyListChunk;
 
                 // sets up the API call for the next offset
                 offset++;
@@ -165,6 +220,7 @@ public class ApiPropertyAssessmentDAO implements PropertyAssessmentDAO {
 
                 // breaks if only doing one API call and not pulling the rest of the data
                 if (getLess) break;
+                //if(concurrentMode) break;
 
             }
 

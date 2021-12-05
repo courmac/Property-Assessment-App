@@ -33,6 +33,8 @@ public class PropertyAssessmentApplication extends Application {
         stage.setTitle("Edmonton Property Assessments");
         stage.setScene(scene);
         stage.show();
+
+
     }
 
     public static void main(String[] args) {

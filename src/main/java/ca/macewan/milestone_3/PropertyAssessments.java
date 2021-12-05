@@ -233,6 +233,8 @@ public class PropertyAssessments {
 
     }
 
+
+
     public ArrayList<PropertyAssessment> getPropertyList() {
         return propertyList;
     }

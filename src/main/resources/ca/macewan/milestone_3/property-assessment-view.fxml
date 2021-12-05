@@ -27,11 +27,28 @@
                         <Insets left="15.0" right="15.0" top="15.0" />
                      </VBox.margin>
                   </ComboBox>
-                  <Button fx:id="readDataButton" mnemonicParsing="false" onAction="#onReadDataButtonClick" prefWidth="400.0" text="Read Data">
+                  <HBox prefHeight="27.0" prefWidth="334.0">
+                     <children>
+                        <Button fx:id="readDataButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onReadDataButtonClick" prefHeight="25.0" text="Read Data" HBox.hgrow="ALWAYS">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="cancel_button" mnemonicParsing="false" onAction="#onStopButtonClick" prefHeight="25.0" prefWidth="75.0" text="Stop">
+                           <HBox.margin>
+                              <Insets left="15.0" right="15.0" />
+                           </HBox.margin></Button>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="10.0" />
+                        <Insets left="15.0" top="6.0" />
                      </VBox.margin>
-                  </Button>
+                  </HBox>
                   <Label layoutX="25.0" layoutY="30.0" text="Find Property Assessment">
                      <font>
                         <Font name="System Bold" size="25.0" />

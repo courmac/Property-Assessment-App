@@ -11,8 +11,10 @@
 
 package ca.macewan.milestone_3;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -34,7 +36,7 @@ public class PropertyAssessmentController implements Initializable {
     @FXML    private ComboBox assessmentClassComboBox;
     @FXML    private TextField minValueTextField;
     @FXML    private TextField maxValueTextField;
-    @FXML    private Button searchButton,resetButton;
+    @FXML    private Button searchButton,resetButton, cancel_button;
     @FXML    private TableColumn<TableViewObject, Integer>  col_account;
     @FXML    private TableColumn<TableViewObject, Integer>  assessedValue;
     @FXML    private TableColumn<TableViewObject, String>  address;
@@ -45,6 +47,7 @@ public class PropertyAssessmentController implements Initializable {
     @FXML    private TableView<TableViewObject> tableViewItem;
     private final ObservableList<TableViewObject> propertyList = FXCollections.observableArrayList();
     private Boolean hasDataRead = false;
+    private Boolean ifStopPressed = false;
 
     PropertyAssessments propertyAssessments;
 
@@ -69,8 +72,13 @@ public class PropertyAssessmentController implements Initializable {
 
         // format the tableView
         formatTable();
-
     }
+
+    @FXML
+    protected void onStopButtonClick(){
+        ifStopPressed = true;
+    }
+
 
     /**
      * helper function used to format the tableView correctly
@@ -106,6 +114,7 @@ public class PropertyAssessmentController implements Initializable {
      */
     @FXML
     protected void onReadDataButtonClick() {
+        ifStopPressed = false;
         // clears what's currently in the tableView
         tableViewItem.getItems().clear();
         assessmentClassComboBox.getSelectionModel().clearSelection();
@@ -137,9 +146,10 @@ public class PropertyAssessmentController implements Initializable {
 
         } else if (index == 2) {
             //Edmonton's Open Data Portal All Data (WARNING LONG LOAD TIME)
-            PropertyAssessmentDAO propertyAssessmentsListDAO = new ApiPropertyAssessmentDAO();
-            propertyAssessments =  propertyAssessmentsListDAO.getAll();
-            populateTable();
+            //PropertyAssessmentDAO propertyAssessmentsListDAO = new ApiPropertyAssessmentDAO();
+            readDataButton.setDisable(true);
+            LoadDataListener();
+            //populateTable();
             hasDataRead = true;
 
         } else {
@@ -148,6 +158,68 @@ public class PropertyAssessmentController implements Initializable {
         }
     }
 
+    private void LoadDataListener() {
+
+            propertyList.clear();
+            propertyAssessments = new PropertyAssessments();
+
+            // Create a background thread to run a long-running task of retrieving all data
+            Thread retrieveThread = new Thread(new RetrieveTask());
+            retrieveThread.setDaemon(true);
+            retrieveThread.start();
+
+    }
+
+    /**
+     * An example of a long-running task.
+     * Here, we retrieve all data and update the table view when a subset of data is available.
+     * Scroll down to the bottom of the table view to see the running task in the background thread.
+     * https://openjfx.io/javadoc/17/javafx.graphics/javafx/concurrent/Task.html
+     */
+    private class RetrieveTask extends Task<Void> {
+        private final ApiPropertyAssessmentDAO dao;
+
+        RetrieveTask() {
+            dao = new ApiPropertyAssessmentDAO();
+        }
+
+        @Override
+        protected Void call() {
+
+            int limit = 10000;
+            int offset = 0;
+            PropertyAssessments assessedValueList = dao.getAllConcurrent(limit, offset);
+            //propertyAssessments.combine(assessedValueList);
+            // Retrieve 1000 rows at a time until all rows are retrieved
+            while (assessedValueList.getPropertyList().size() > 0) {
+                if (isCancelled() ) break;
+                PropertyAssessments propertyAssessmentsChunk = assessedValueList;
+                Platform.runLater(() -> {
+
+                    // We add subsets of data to the table (limit rows at a time)
+                    // fills the tableView with the propertyList
+                    for (PropertyAssessment prop : propertyAssessmentsChunk.getPropertyList()){
+                        propertyList.add(new TableViewObject(prop));
+                    }
+                    propertyAssessments.combine(propertyAssessmentsChunk);
+                    readDataButton.setText("Read Data: Entries Read: " + propertyAssessments.getPropertyList().size());
+
+
+
+                });
+                if (ifStopPressed) break;
+                // Retrieve the next batch
+                offset += limit;
+                assessedValueList = dao.getAllConcurrent(limit, offset);
+            }
+
+            Platform.runLater(() -> readDataButton.setDisable(false));
+
+            //propertyAssessments = assessedValueList;
+
+            return null;
+        }
+    }
 
     /**
      * method for when reset button is clicked
