@@ -131,6 +131,14 @@ public class PropertyAssessment {
         return location;
     }
 
+    public double getLat() {
+        return location.getLatitude();
+    }
+
+    public double getLong() {
+        return location.getLongitude();
+    }
+
     public Neighbourhood getNeighbourhood() {
         return neighbourhood;
     }

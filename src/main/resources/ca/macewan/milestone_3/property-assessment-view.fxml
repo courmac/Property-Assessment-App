@@ -12,24 +12,24 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
          <children>
-            <VBox layoutX="127.0" layoutY="138.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+            <VBox layoutX="127.0" layoutY="138.0" prefHeight="25.0" prefWidth="100.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                <children>
                   <Label text="Select Data Source">
                      <font>
                         <Font name="System Bold" size="25.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="15.0" top="20.0" />
+                        <Insets left="15.0" top="15.0" />
                      </VBox.margin>
                   </Label>
                   <ComboBox id="sourceComboBox" fx:id="sourceComboBox" prefWidth="400.0">
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="15.0" />
+                        <Insets left="15.0" right="15.0" top="10.0" />
                      </VBox.margin>
                   </ComboBox>
                   <HBox prefHeight="27.0" prefWidth="334.0">
                      <children>
-                        <Button fx:id="readDataButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onReadDataButtonClick" prefHeight="25.0" text="Read Data" HBox.hgrow="ALWAYS">
+                        <Button fx:id="readDataButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onReadDataButtonClick" prefHeight="0.0" text="Read Data" HBox.hgrow="ALWAYS">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -54,12 +54,12 @@
                         <Font name="System Bold" size="25.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="15.0" top="20.0" />
+                        <Insets left="15.0" top="10.0" />
                      </VBox.margin>
                   </Label>
                   <Label text="Account Number:">
                      <VBox.margin>
-                        <Insets left="15.0" top="4.0" />
+                        <Insets left="15.0" />
                      </VBox.margin>
                      <font>
                         <Font size="16.0" />
@@ -67,7 +67,7 @@
                   </Label>
                   <TextField id="accountNumberTextField" fx:id="accountNumberTextField">
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="4.0" />
+                        <Insets left="15.0" right="15.0" />
                      </VBox.margin>
                   </TextField>
                   <Label layoutX="25.0" layoutY="166.0" text="Adress (#suite #house street):">
@@ -75,12 +75,12 @@
                         <Font size="16.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="15.0" top="10.0" />
+                        <Insets left="15.0" />
                      </VBox.margin>
                   </Label>
                   <TextField id="adressTextField" fx:id="addressTextField" layoutX="25.0" layoutY="195.0">
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="4.0" />
+                        <Insets left="15.0" right="15.0" />
                      </VBox.margin>
                   </TextField>
                   <Label layoutX="25.0" layoutY="230.0" text="Neighbourhood:">
@@ -88,12 +88,12 @@
                         <Font size="16.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="15.0" top="10.0" />
+                        <Insets left="15.0" />
                      </VBox.margin>
                   </Label>
                   <TextField id="neighbourhoodTextField" fx:id="neighbourhoodTextField" layoutX="25.0" layoutY="259.0">
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="4.0" />
+                        <Insets left="15.0" right="15.0" />
                      </VBox.margin>
                   </TextField>
                   <Label layoutX="25.0" layoutY="230.0" text="Assessment Class">
@@ -101,12 +101,12 @@
                         <Font size="16.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="15.0" top="10.0" />
+                        <Insets left="15.0" />
                      </VBox.margin>
                   </Label>
                   <ComboBox id="assessmentClassComboBox" fx:id="assessmentClassComboBox" layoutX="25.0" layoutY="81.0" prefWidth="400.0">
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="4.0" />
+                        <Insets left="15.0" right="15.0" />
                      </VBox.margin>
                   </ComboBox>
                   <Label layoutX="25.0" layoutY="358.0" text="Assessment Class Range:">
@@ -114,7 +114,7 @@
                         <Font size="16.0" />
                      </font>
                      <VBox.margin>
-                        <Insets left="15.0" top="10.0" />
+                        <Insets left="15.0" />
                      </VBox.margin>
                   </Label>
                   <GridPane>
@@ -124,11 +124,9 @@
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <VBox.margin>
-                        <Insets left="15.0" right="15.0" top="10.0" />
+                        <Insets left="15.0" right="15.0" />
                      </VBox.margin>
                      <children>
                         <TextField id="nimValueTextBox" fx:id="minValueTextField" promptText="Min Value">
@@ -141,19 +139,88 @@
                               <Insets left="4.0" />
                            </GridPane.margin>
                         </TextField>
-                        <Button id="searchButton" fx:id="searchButton" mnemonicParsing="false" onAction="#onSearchButtonClick" prefWidth="200.0" text="Search" GridPane.rowIndex="1">
+                     </children>
+                  </GridPane>
+                  <Label text="Search by Radius:">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets left="15.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <GridPane>
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <TextField fx:id="kilometer_text_field" promptText="Km Radius">
                            <GridPane.margin>
                               <Insets right="4.0" />
-                           </GridPane.margin>
-                        </Button>
-                        <Button id="resetButton" fx:id="resetButton" mnemonicParsing="false" onAction="#onResetButtonClick" prefWidth="200.0" text="Reset" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           </GridPane.margin></TextField>
+                        <TextField fx:id="lat_text_field" promptText="Latitude" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets right="4.0" />
+                           </GridPane.margin></TextField>
+                        <TextField fx:id="long_text_field" promptText="longitude" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets left="4.0" />
+                           </GridPane.margin></TextField>
+                        <Label text="Has Garage:" GridPane.rowIndex="2">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <CheckBox fx:id="has_garage" mnemonicParsing="false" text="select if has garage" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets left="4.0" />
                            </GridPane.margin>
-                        </Button>
+                        </CheckBox>
                      </children>
+                     <VBox.margin>
+                        <Insets left="15.0" right="15.0" />
+                     </VBox.margin>
                   </GridPane>
-                  <BorderPane prefHeight="200.0" prefWidth="200.0" />
+                  <HBox prefHeight="25.0" prefWidth="200.0">
+                     <children>
+                        <Button id="searchButton" fx:id="searchButton" mnemonicParsing="false" onAction="#onSearchButtonClick" prefHeight="25.0" prefWidth="200.0" text="Search">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets left="15.0" right="4.0" />
+                           </padding></Button>
+                        <Button id="resetButton" fx:id="resetButton" mnemonicParsing="false" onAction="#onResetButtonClick" prefHeight="25.0" prefWidth="200.0" text="Reset">
+                           <padding>
+                              <Insets left="4.0" right="15.0" />
+                           </padding></Button>
+                     </children>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </HBox>
+                  <Button fx:id="export_button" mnemonicParsing="false" onAction="#onExportClick" prefHeight="25.0" text="Export Search to CSV">
+                     <VBox.margin>
+                        <Insets left="15.0" top="15.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Label fx:id="search_results">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="15.0" top="15.0" />
+                     </VBox.margin>
+                  </Label>
                </children>
             </VBox>
          </children></AnchorPane>

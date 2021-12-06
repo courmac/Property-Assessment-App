@@ -11,6 +11,7 @@
 
 package ca.macewan.milestone_3;
 
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +21,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -35,8 +38,10 @@ public class PropertyAssessmentController implements Initializable {
     @FXML    private TextField neighbourhoodTextField;
     @FXML    private ComboBox assessmentClassComboBox;
     @FXML    private TextField minValueTextField;
-    @FXML    private TextField maxValueTextField;
-    @FXML    private Button searchButton,resetButton, cancel_button;
+    @FXML    private Label search_results;
+    @FXML    private TextField maxValueTextField, kilometer_text_field, lat_text_field, long_text_field;
+    @FXML    private Button searchButton,resetButton, cancel_button, export_button;
+    @FXML    private CheckBox has_garage;
     @FXML    private TableColumn<TableViewObject, Integer>  col_account;
     @FXML    private TableColumn<TableViewObject, Integer>  assessedValue;
     @FXML    private TableColumn<TableViewObject, String>  address;
@@ -44,12 +49,15 @@ public class PropertyAssessmentController implements Initializable {
     @FXML    private TableColumn<TableViewObject, String>  assessmentClass;
     @FXML    private TableColumn<TableViewObject, String>  location;
 
+
     @FXML    private TableView<TableViewObject> tableViewItem;
     private final ObservableList<TableViewObject> propertyList = FXCollections.observableArrayList();
     private Boolean hasDataRead = false;
     private Boolean ifStopPressed = false;
 
-    PropertyAssessments propertyAssessments;
+    PropertyAssessments importedPropertyAssessments;
+    ArrayList<PropertyAssessment> searchPropertyAssessments;
+
 
     /**
      * initializes the window and any of the parameters that can't be stored in a layout file
@@ -69,6 +77,8 @@ public class PropertyAssessmentController implements Initializable {
         assessmentClassComboBox.getItems().add("NONRES MUNICIPAL/RES EDUCATION");
         assessmentClassComboBox.getItems().add("COMMERCIAL");
         assessmentClassComboBox.getItems().add("none");
+        cancel_button.setDisable(true); //hide cancel button
+        export_button.setDisable(true);
 
         // format the tableView
         formatTable();
@@ -128,29 +138,39 @@ public class PropertyAssessmentController implements Initializable {
         int index = sourceComboBox.getSelectionModel().getSelectedIndex();
 
 
-        propertyAssessments = new PropertyAssessments();
+        importedPropertyAssessments = new PropertyAssessments();
         // CSV File
         if (index == 0) {
             PropertyAssessmentDAO propertyAssessmentsListDAO = new CsvPropertyAssessmentDAO();
-            propertyAssessments = propertyAssessmentsListDAO.getAll();
+            importedPropertyAssessments = propertyAssessmentsListDAO.getAll();
             populateTable();
             hasDataRead = true;
+            searchPropertyAssessments = importedPropertyAssessments.getPropertyList();
+
 
         } else if (index == 1) {
             // Edmonton's Open Data Portal (First 1,000 entries)
             ApiPropertyAssessmentDAO propertyAssessmentsListDAO = new ApiPropertyAssessmentDAO();
             propertyAssessmentsListDAO.setOffsetSize(1000);
-            propertyAssessments =  propertyAssessmentsListDAO.getLess();
+            importedPropertyAssessments =  propertyAssessmentsListDAO.getLess();
             populateTable();
             hasDataRead = true;
+            searchPropertyAssessments = importedPropertyAssessments.getPropertyList();
 
         } else if (index == 2) {
             //Edmonton's Open Data Portal All Data (WARNING LONG LOAD TIME)
             //PropertyAssessmentDAO propertyAssessmentsListDAO = new ApiPropertyAssessmentDAO();
             readDataButton.setDisable(true);
+            cancel_button.setDisable(false);
+            cancel_button.setText("Stop");
+            searchButton.setDisable(true);
+            searchButton.setText("Search - disabled");
+            resetButton.setDisable(true);
             LoadDataListener();
             //populateTable();
             hasDataRead = true;
+
+            searchPropertyAssessments = importedPropertyAssessments.getPropertyList();
 
         } else {
             // displays info popup if no source was selected
@@ -161,7 +181,7 @@ public class PropertyAssessmentController implements Initializable {
     private void LoadDataListener() {
 
             propertyList.clear();
-            propertyAssessments = new PropertyAssessments();
+            importedPropertyAssessments = new PropertyAssessments();
 
             // Create a background thread to run a long-running task of retrieving all data
             Thread retrieveThread = new Thread(new RetrieveTask());
@@ -201,8 +221,8 @@ public class PropertyAssessmentController implements Initializable {
                     for (PropertyAssessment prop : propertyAssessmentsChunk.getPropertyList()){
                         propertyList.add(new TableViewObject(prop));
                     }
-                    propertyAssessments.combine(propertyAssessmentsChunk);
-                    readDataButton.setText("Read Data: Entries Read: " + propertyAssessments.getPropertyList().size());
+                    importedPropertyAssessments.combine(propertyAssessmentsChunk);
+                    readDataButton.setText("Read Data: Entries Read: " + importedPropertyAssessments.getPropertyList().size());
 
 
 
@@ -213,7 +233,15 @@ public class PropertyAssessmentController implements Initializable {
                 assessedValueList = dao.getAllConcurrent(limit, offset);
             }
 
+
             Platform.runLater(() -> readDataButton.setDisable(false));
+            Platform.runLater(() -> cancel_button.setDisable(true));
+            Platform.runLater(() -> searchButton.setDisable(false));
+            Platform.runLater(() -> resetButton.setDisable(false));
+            Platform.runLater(() -> searchButton.setText("Search"));
+            Platform.runLater(() -> resetButton.setDisable(false));
+            Platform.runLater(() -> cancel_button.setText("Finished"));
+            //Platform.runLater(() -> export_button.setDisable(false));
 
             //propertyAssessments = assessedValueList;
 
@@ -242,6 +270,12 @@ public class PropertyAssessmentController implements Initializable {
         neighbourhoodTextField.clear();
         minValueTextField.clear();
         maxValueTextField.clear();
+        kilometer_text_field.clear();
+        lat_text_field.clear();
+        long_text_field.clear();
+        has_garage.setSelected(false);
+        export_button.setDisable(true);
+        searchPropertyAssessments = new ArrayList<PropertyAssessment>();
 
         // repopulates the table with the source data
         populateTable();
@@ -253,9 +287,31 @@ public class PropertyAssessmentController implements Initializable {
     private void populateTable(){
 
         // fills the tableView with the propertyList
-        for (PropertyAssessment prop : propertyAssessments.getPropertyList()){
+        for (PropertyAssessment prop : importedPropertyAssessments.getPropertyList()){
             propertyList.add(new TableViewObject(prop));
         }
+    }
+
+    @FXML
+    protected void onExportClick() throws IOException {
+
+        String CscFilename = "searchResults.csv";
+        CSVWriter writer = new CSVWriter(new FileWriter(CscFilename));
+        String[] str = {"Account Number", "Address", "Assessed Value", "Has Garage", "Location", "Neighbourhood", "Assessment Class"};
+        writer.writeNext(str);
+
+
+        for (PropertyAssessment prop : searchPropertyAssessments){
+            str = new String[]{ Integer.toString(prop.getAccountNumber()),
+            prop.getAddress().toString(),
+            Integer.toString(prop.assessedValue()),
+            Boolean.toString(prop.isHasGarage()),
+            prop.getLocation().toString(),
+            prop.getNeighbourhood().toString(),
+            prop.getAssessmentClass().toString()};
+            writer.writeNext(str);
+        }
+        writer.close();
     }
 
     /**
@@ -279,6 +335,7 @@ public class PropertyAssessmentController implements Initializable {
 
         // populates the tableView with the validates search parameters
         populateSearchResults(validatedInput);
+        search_results.setText("There were: " + searchPropertyAssessments.size() + " Results");
 
     }
 
@@ -301,6 +358,8 @@ public class PropertyAssessmentController implements Initializable {
         Predicate<PropertyAssessment> predicateAssessmentClass;
         Predicate<PropertyAssessment> predicateMinValue;
         Predicate<PropertyAssessment> predicateMaxValue;
+        Predicate<PropertyAssessment> predicateRadiusSearch;
+        Predicate<PropertyAssessment> predicateHasGarage;
 
 
         if(searchParameters[1].equals("")) predicateAccountNumber = a -> true;
@@ -321,19 +380,38 @@ public class PropertyAssessmentController implements Initializable {
         if(searchParameters[6].equals("")) predicateMaxValue = a -> true;
         else predicateMaxValue = a -> a.getAssessedValue() <= Integer.parseInt(searchParameters[6]);
 
-        ArrayList<PropertyAssessment> tempPropertyList = (ArrayList<PropertyAssessment>) propertyAssessments.getPropertyList().stream()
+        if(searchParameters[7].equals("")) predicateRadiusSearch = a -> true;
+        else {
+            predicateRadiusSearch = (a)->
+
+                    distanceBetweenTwoPoints(Double.parseDouble(searchParameters[8]),
+                            Double.parseDouble(searchParameters[9]),
+                            a.getLat(),
+                            a.getLong())
+                      <= Double.parseDouble(searchParameters[7]);
+        }
+        if (!has_garage.isSelected()) predicateHasGarage = a -> true;
+        else{
+            predicateHasGarage = a -> a.isHasGarage();
+        }
+
+        ArrayList<PropertyAssessment> tempPropertyList = (ArrayList<PropertyAssessment>) importedPropertyAssessments.getPropertyList().stream()
                 .filter(predicateAccountNumber)
                 .filter(predicateAddress)
                 .filter(predicateNeighbourhood)
                 .filter(predicateAssessmentClass)
                 .filter(predicateMinValue)
                 .filter(predicateMaxValue)
+                .filter(predicateRadiusSearch)
+                .filter(predicateHasGarage)
                 .collect(Collectors.toList());
 
 
         for (PropertyAssessment prop : tempPropertyList){
             this.propertyList.add(new TableViewObject(prop));
         }
+        searchPropertyAssessments= tempPropertyList;
+        export_button.setDisable(false);
     }
 
     /**
@@ -343,7 +421,7 @@ public class PropertyAssessmentController implements Initializable {
      */
     private String[] validateSearch(){
 
-        String[] validatedInput = new String[7];
+        String[] validatedInput = new String[10];
         validatedInput[0] = "empty search";
 
         // Validates that the Account number is an int, if not an int returns displays informative popup and returns null
@@ -390,7 +468,6 @@ public class PropertyAssessmentController implements Initializable {
             }
         }
 
-
         // Validates that the min value is an int, if not an int returns displays informative popup and returns null
         // if user field was empty saves it as ""
         try{
@@ -422,6 +499,35 @@ public class PropertyAssessmentController implements Initializable {
             return validatedInput;
         }
 
+       // validate the radius search class
+        try{
+            if(kilometer_text_field.getText().equals("")
+                    && lat_text_field.getText().equals("")
+                    && long_text_field.getText().equals("")){
+                validatedInput[7] = "";
+                validatedInput[8] = "";
+                validatedInput[9] = "";
+
+            } else if (kilometer_text_field.getText().equals("")
+                    || lat_text_field.getText().equals("")
+                    || long_text_field.getText().equals("")){
+                validatedInput[0] = null;
+                showPopup("Missing value for Km radius, or Longitude. or Latitude");
+                return validatedInput;
+            } else {
+                validatedInput[7] = String.valueOf(Double.parseDouble(kilometer_text_field.getText()));
+                validatedInput[8] = String.valueOf(Double.parseDouble(lat_text_field.getText()));
+                validatedInput[9] = String.valueOf(Double.parseDouble(long_text_field.getText()));
+                validatedInput[0]="not null";
+            }
+        } catch (NumberFormatException e){
+            validatedInput[0] = null;
+            showPopup("Please enter valid Km radius, or Longitude. or Latitude");
+            return validatedInput;
+        }
+
+
+
        // shows popup message if no search parameters were entered
        if (validatedInput[0].equals("empty search")) {
            validatedInput[0] = null;
@@ -430,6 +536,18 @@ public class PropertyAssessmentController implements Initializable {
 
 
         return validatedInput;
+    }
+
+
+    public static double distanceBetweenTwoPoints(double lat1, double long1, double lat2, double long2) {
+        double deltaLat = Math.toRadians(lat2 - lat1);
+        double deltaLong = Math.toRadians(long2 - long1);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        double a = Math.pow(Math.sin(deltaLat / 2),2) + Math.pow(Math.sin(deltaLong / 2),2) * Math.cos(lat1) * Math.cos(lat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        return 6372.8 * c;
     }
 
     /**
@@ -441,4 +559,8 @@ public class PropertyAssessmentController implements Initializable {
         alert.setHeaderText(popupMessage);
         alert.show();
     }
+
+
+
+
 }
