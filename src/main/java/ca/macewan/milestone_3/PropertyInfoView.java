@@ -50,6 +50,9 @@ public class PropertyInfoView implements Initializable {
 
         NeighbourhoodQuery nhQuery = new NeighbourhoodQuery(nhID);
 
+//        ApiPropertyAssessmentDAO calcs = new ApiPropertyAssessmentDAO();
+//        PropertyAssessments nhProps = calcs.getByNeighbourhood(nhQuery.getName());
+//        int[] data = nhProps.propertyAssessmentStats();
 
 
         // set views

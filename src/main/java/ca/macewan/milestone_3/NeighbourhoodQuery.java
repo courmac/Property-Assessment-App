@@ -98,28 +98,41 @@ public class NeighbourhoodQuery {
     @Deprecated
     private void buildingPermits(){
 
-        String source = "https://data.edmonton.ca/resource/24uj-dj8v.json?$where=&year=2021&neighbourhood_numberr=" + neighbourhood_number;
+        String sourceNumPermits = "https://data.edmonton.ca/resource/24uj-dj8v.json?$where=&year=2021&neighbourhood_numberr="+neighbourhood_number+"&$select=count(row_id)";
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(source)).GET().build();
+        HttpRequest requestNumPermits = HttpRequest.newBuilder().uri(URI.create(sourceNumPermits)).GET().build();
 
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String jsonString =  response.body();
+            HttpResponse<String> responseNumPermits = client.send(requestNumPermits, HttpResponse.BodyHandlers.ofString());
+            String jsonStringNumPermits =  responseNumPermits.body();
 
             JsonParser parser = new JsonParser();
-            JsonArray array = parser.parse(jsonString).getAsJsonArray();
+            JsonArray arrayNumPermits = parser.parse(jsonStringNumPermits).getAsJsonArray();
 
-            buildingPermits = array.size();
+            buildingPermits = arrayNumPermits.get(0).getAsJsonObject().get("count_row_id").getAsInt();
+            String source = "https://data.edmonton.ca/resource/24uj-dj8v.json?$where=&year=2021&neighbourhood_numberr="+neighbourhood_number;
+            HttpClient client2 = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(source)).GET().build();
+            HttpResponse<String> responseNumPermits2 = client2.send(request, HttpResponse.BodyHandlers.ofString());
+            String jsonStringNumPermits2 =  responseNumPermits2.body();
 
-            for (JsonElement obj : array){
-                buildingPermitsValue += obj.getAsJsonObject().get("construction_value").getAsFloat();
+            JsonParser parser2 = new JsonParser();
+            JsonArray arrayNumPermits2 = parser2.parse(jsonStringNumPermits2).getAsJsonArray();
+
+            for (int i=0; i < arrayNumPermits2.size(); i++){
+
+                if (arrayNumPermits2.get(i).getAsJsonObject().get("construction_value") == null) {
+                    continue;
+                } else {
+                    buildingPermitsValue += arrayNumPermits2.get(i).getAsJsonObject().get("construction_value").getAsFloat();
+                }
+
+
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
-            buildingPermits = 0;
-//            buildingPermitsValue = 0;
+            buildingPermits = 1;
+            buildingPermitsValue = 1;
         }
     }
 
