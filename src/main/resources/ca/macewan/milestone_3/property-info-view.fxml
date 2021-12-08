@@ -5,7 +5,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.web.*?>
 
-<AnchorPane prefHeight="873.0" prefWidth="528.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.macewan.milestone_3.PropertyInfoView">
+<AnchorPane prefHeight="873.0" prefWidth="528.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.macewan.milestone_3.PropertyInfoView">
    <children>
       <WebView fx:id="webView" layoutX="30.0" layoutY="424.0" prefHeight="390.0" prefWidth="468.0" />
       <Label fx:id="nhTitle" layoutX="30.0" layoutY="26.0" prefHeight="35.0" prefWidth="468.0" text="123 Address Street">

@@ -27,7 +27,7 @@ public class PropertyAssessmentApplication extends Application {
      * @throws IOException
      */
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(PropertyAssessmentApplication.class.getResource("property-assessment-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1500, 1000);
         stage.setTitle("Edmonton Property Assessments");

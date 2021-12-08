@@ -26,6 +26,18 @@ public class PropertyInfoView implements Initializable {
     @FXML
     private WebView webView;
 
+    // Statistics
+    @FXML
+    private Label numCats;
+    @FXML
+    private Label numDogs;
+    @FXML
+    private Label numTrees;
+    @FXML
+    private Label numPermits;
+    @FXML
+    private Label valuePermits;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -33,21 +45,25 @@ public class PropertyInfoView implements Initializable {
         PropertyHolder holder = PropertyHolder.getInstance();
         TableViewObject row = holder.getProperty();
         PropertyAssessments propAssessments = holder.getImportedPropertyAssessments();
-//
+
         int nhID = propAssessments.findAccount(row.getAccount()).getNeighbourhood().getNeighbourhoodId();
-//
+
         NeighbourhoodQuery nhQuery = new NeighbourhoodQuery(nhID);
 
 
 
-//        // set views
+        // set views
         nhTitle.setText(row.getAddress());
         nhNeighbourhood.setText(row.getNeighbourhood());
-
-
 //        nhDescription.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur risus dolor, auctor non diam tincidunt, malesuada maximus mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Proin varius elit eu elit tincidunt, sit amet gravida nunc tincidunt. Maecenas in augue ac massa accumsan posuere eu sed enim. Cras elit tortor, lacinia in ligula vitae, suscipit dapibus ipsum. Praesent ornare erat nec nisi consectetur, et ultrices enim pulvinar.");
         nhDescription.setText(nhQuery.getNeighbourhoodDescription());
-        // Google Maps Embed
+        numCats.setText(nhQuery.getNumCats());
+        numDogs.setText(nhQuery.getNumDogs());
+        numPermits.setText(nhQuery.getBuildingPermits());
+        numTrees.setText(nhQuery.getTrees());
+        valuePermits.setText(nhQuery.getBuildingPermitsValue());
+
+//      Google Maps Embed
         String address = row.getAddress().replace(" ","+");
         String place = address + ",Edmonton+AB";
         webView.getEngine().loadContent("<iframe\n" +

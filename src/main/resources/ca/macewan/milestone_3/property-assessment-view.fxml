@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.macewan.milestone_3.PropertyAssessmentController">
+<SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.macewan.milestone_3.PropertyAssessmentController">
   <items>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="188.0">
          <padding>
@@ -70,7 +70,7 @@
                         <Insets left="15.0" right="15.0" />
                      </VBox.margin>
                   </TextField>
-                  <Label layoutX="25.0" layoutY="166.0" text="Adress (#suite #house street):">
+                  <Label layoutX="25.0" layoutY="166.0" text="Address (#suite #house street):">
                      <font>
                         <Font size="16.0" />
                      </font>

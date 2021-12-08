@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.text.NumberFormat;
 
 public class NeighbourhoodQuery {
 
@@ -53,7 +54,7 @@ public class NeighbourhoodQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            neighbourhoodDescription = "";
+            neighbourhoodDescription = "No Data";
         }
     }
 
@@ -64,9 +65,9 @@ public class NeighbourhoodQuery {
     @Deprecated
     private void getNeighbourhoodPets(){
 
-        String cats = "https://data.edmonton.ca/resource/5squ-mg4w.json?$where=&year=2021&pet_type=Cat&neighbourhood_id=" + neighbourhood_number;
+        String cats = "https://data.edmonton.ca/resource/5squ-mg4w.json?$where=&year=2021&pet_type=Cat&neighbourhood_id=" + neighbourhood_number+"&$select=count(neighbourhood_id)";
         //String type = "+AND+neighbourhood_id=";
-        String dogs = "https://data.edmonton.ca/resource/5squ-mg4w.json?$where=&year=2021&pet_type=Dog&neighbourhood_id="+ neighbourhood_number;
+        String dogs = "https://data.edmonton.ca/resource/5squ-mg4w.json?$where=&year=2021&pet_type=Dog&neighbourhood_id="+ neighbourhood_number+"&$select=count(neighbourhood_id)";
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest requestCats = HttpRequest.newBuilder().uri(URI.create(cats)).GET().build();
@@ -83,11 +84,14 @@ public class NeighbourhoodQuery {
             JsonArray arrayCats = parser.parse(jsonStringCats).getAsJsonArray();
             JsonArray arrayDogs = parser.parse(jsonStringDogs).getAsJsonArray();
 
-            numCats = arrayCats.size();
-            numDogs = arrayDogs.size();
+            numCats = arrayCats.get(0).getAsJsonObject().get("count_neighbourhood_id").getAsInt();
+            numDogs = arrayDogs.get(0).getAsJsonObject().get("count_neighbourhood_id").getAsInt();
 
         } catch (Exception e) {
             e.printStackTrace();
+            numCats = 0;
+            numDogs = 0;
+
         }
     }
 
@@ -114,7 +118,8 @@ public class NeighbourhoodQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            neighbourhoodDescription = "";
+            buildingPermits = 0;
+//            buildingPermitsValue = 0;
         }
     }
 
@@ -146,12 +151,12 @@ public class NeighbourhoodQuery {
         return neighbourhoodDescription;
     }
 
-    public int getNumCats() {
-        return numCats;
+    public String getNumCats() {
+        return String.valueOf(numCats);
     }
 
-    public int getNumDogs() {
-        return numDogs;
+    public String getNumDogs() {
+        return String.valueOf(numDogs);
     }
 
     public int getNeighbourhood_number() {
@@ -162,15 +167,18 @@ public class NeighbourhoodQuery {
         return name;
     }
 
-    public int getBuildingPermits() {
-        return buildingPermits;
+    public String getBuildingPermits() {
+
+        return String.valueOf(buildingPermits);
     }
 
-    public float getBuildingPermitsValue() {
-        return buildingPermitsValue;
+    public String getBuildingPermitsValue() {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        String moneyString = formatter.format(buildingPermitsValue);
+        return moneyString;
     }
 
-    public int getTrees() {
-        return trees;
+    public String getTrees() {
+        return String.valueOf(trees);
     }
 }
