@@ -17,9 +17,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,7 +61,8 @@ public class PropertyAssessmentController implements Initializable {
     private Boolean ifStopPressed = false;
 
     PropertyAssessments importedPropertyAssessments;
-    ArrayList<PropertyAssessment> searchPropertyAssessments;
+    ArrayList<PropertyAssessment> searchPropertyAssessments;  // search results
+
 
 
     /**
@@ -117,6 +123,55 @@ public class PropertyAssessmentController implements Initializable {
         location.setCellValueFactory(new PropertyValueFactory<>("location"));
     }
 
+    /**
+     * gathers row information when row is double-clicked and allows for the information to
+     * be passed into the opened neighbourhood info window
+     */
+    private void onDoubleClickRow() {
+        tableViewItem.setRowFactory(tv -> {
+            TableRow<TableViewObject> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
+                        && event.getClickCount() == 2) {
+
+                    TableViewObject clickedRow = row.getItem();
+
+                    // pass information to next stage with singleton pattern
+                    PropertyHolder holder = PropertyHolder.getInstance();
+                    holder.setProperty(clickedRow);
+                    holder.setImportedPropertyAssessments(importedPropertyAssessments);
+                    FXMLLoader fxmlLoader = new FXMLLoader(PropertyAssessmentApplication.class.getResource("property-info-view.fxml"));
+                    Scene scene = null;
+                    try {
+                        scene = new Scene(fxmlLoader.load(), 528, 873);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Stage nhStage = new Stage();
+                    nhStage.setTitle("Neighbourhood Information");
+                    nhStage.setScene(scene);
+                    nhStage.initModality(Modality.NONE);
+                    nhStage.show();
+                    printRow(clickedRow);
+                }
+            });
+            return row;
+        });
+    }
+
+    private void printRow(TableViewObject item) {
+        System.out.println(item.getAddress());
+    }
+
+    public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(PropertyAssessmentApplication.class.getResource("property-info-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1500, 1000);
+        stage.setTitle("Neighbourhood Information");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+
 
     /**
      * method for when Read Data button is clicked, chooses which data source to use for the application shows information
@@ -133,6 +188,7 @@ public class PropertyAssessmentController implements Initializable {
         neighbourhoodTextField.clear();
         minValueTextField.clear();
         maxValueTextField.clear();
+        onDoubleClickRow();
 
         // gets the index of the sourceComboBox
         int index = sourceComboBox.getSelectionModel().getSelectedIndex();
