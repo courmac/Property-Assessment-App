@@ -1,12 +1,12 @@
-/**
- * Student's Name: Orest Dushkevich and Courtney McNeilly
- * Milestone #2
- * CMPT 305 LAB X02L Fall 2021
- * Instructor's Name: Indratmo Indratmo
- *
- * Purpose:
- * This is the controller for the application window for Milestone #2 and contains the functionality  of teh application
- *
+/*
+  Student's Name: Orest Dushkevich and Courtney McNeilly
+  Milestone #2
+  CMPT 305 LAB X02L Fall 2021
+  Instructor's Name: Indratmo Indratmo
+
+  Purpose:
+  This is the controller for the application window for Milestone #2 and contains the functionality  of teh application
+
  */
 
 package ca.macewan.milestone_3;
@@ -36,12 +36,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class PropertyAssessmentController implements Initializable {
-    @FXML    private ComboBox sourceComboBox;
+    @FXML    private ComboBox<String> sourceComboBox;
     @FXML    private Button readDataButton;
     @FXML    private TextField accountNumberTextField;
     @FXML    private TextField addressTextField;
     @FXML    private TextField neighbourhoodTextField;
-    @FXML    private ComboBox assessmentClassComboBox;
+    @FXML    private ComboBox<String> assessmentClassComboBox;
     @FXML    private TextField minValueTextField;
     @FXML    private Label search_results;
     @FXML    private TextField maxValueTextField, kilometer_text_field, lat_text_field, long_text_field;
@@ -71,7 +71,6 @@ public class PropertyAssessmentController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        sourceComboBox.getItems().add("CSV File");
         sourceComboBox.getItems().add("Edmonton's Open Data Portal (First 1,000 entries)");
         sourceComboBox.getItems().add("Edmonton's Open Data Portal All Data (WARNING LONG LOAD TIME)");
 
@@ -90,6 +89,9 @@ public class PropertyAssessmentController implements Initializable {
         formatTable();
     }
 
+    /**
+     * sets ifStopPressed = true so that the backround thread stops running
+     */
     @FXML
     protected void onStopButtonClick(){
         ifStopPressed = true;
@@ -196,7 +198,7 @@ public class PropertyAssessmentController implements Initializable {
 
         importedPropertyAssessments = new PropertyAssessments();
         // CSV File
-        if (index == 0) {
+        if (index == 3) {
             PropertyAssessmentDAO propertyAssessmentsListDAO = new CsvPropertyAssessmentDAO();
             importedPropertyAssessments = propertyAssessmentsListDAO.getAll();
             populateTable();
@@ -204,7 +206,7 @@ public class PropertyAssessmentController implements Initializable {
             searchPropertyAssessments = importedPropertyAssessments.getPropertyList();
 
 
-        } else if (index == 1) {
+        } else if (index == 0) {
             // Edmonton's Open Data Portal (First 1,000 entries)
             ApiPropertyAssessmentDAO propertyAssessmentsListDAO = new ApiPropertyAssessmentDAO();
             propertyAssessmentsListDAO.setOffsetSize(1000);
@@ -213,9 +215,9 @@ public class PropertyAssessmentController implements Initializable {
             hasDataRead = true;
             searchPropertyAssessments = importedPropertyAssessments.getPropertyList();
 
-        } else if (index == 2) {
+        } else if (index == 1) {
             //Edmonton's Open Data Portal All Data (WARNING LONG LOAD TIME)
-            //PropertyAssessmentDAO propertyAssessmentsListDAO = new ApiPropertyAssessmentDAO();
+            // formats all the buttons
             readDataButton.setDisable(true);
             cancel_button.setDisable(false);
             cancel_button.setText("Stop");
@@ -223,9 +225,7 @@ public class PropertyAssessmentController implements Initializable {
             searchButton.setText("Search - disabled");
             resetButton.setDisable(true);
             LoadDataListener();
-            //populateTable();
             hasDataRead = true;
-
             searchPropertyAssessments = importedPropertyAssessments.getPropertyList();
 
         } else {
@@ -247,10 +247,7 @@ public class PropertyAssessmentController implements Initializable {
     }
 
     /**
-     * An example of a long-running task.
-     * Here, we retrieve all data and update the table view when a subset of data is available.
-     * Scroll down to the bottom of the table view to see the running task in the background thread.
-     * https://openjfx.io/javadoc/17/javafx.graphics/javafx/concurrent/Task.html
+     * this class runs the API call in a parallel thread so that the application does not freeze
      */
     private class RetrieveTask extends Task<Void> {
         private final ApiPropertyAssessmentDAO dao;
@@ -265,7 +262,7 @@ public class PropertyAssessmentController implements Initializable {
             int limit = 10000;
             int offset = 0;
             PropertyAssessments assessedValueList = dao.getAllConcurrent(limit, offset);
-            //propertyAssessments.combine(assessedValueList);
+
             // Retrieve 1000 rows at a time until all rows are retrieved
             while (assessedValueList.getPropertyList().size() > 0) {
                 if (isCancelled() ) break;
@@ -279,16 +276,12 @@ public class PropertyAssessmentController implements Initializable {
                     }
                     importedPropertyAssessments.combine(propertyAssessmentsChunk);
                     readDataButton.setText("Read Data: Entries Read: " + importedPropertyAssessments.getPropertyList().size());
-
-
-
                 });
                 if (ifStopPressed) break;
                 // Retrieve the next batch
                 offset += limit;
                 assessedValueList = dao.getAllConcurrent(limit, offset);
             }
-
 
             Platform.runLater(() -> readDataButton.setDisable(false));
             Platform.runLater(() -> cancel_button.setDisable(true));
@@ -297,10 +290,6 @@ public class PropertyAssessmentController implements Initializable {
             Platform.runLater(() -> searchButton.setText("Search"));
             Platform.runLater(() -> resetButton.setDisable(false));
             Platform.runLater(() -> cancel_button.setText("Finished"));
-            //Platform.runLater(() -> export_button.setDisable(false));
-
-            //propertyAssessments = assessedValueList;
-
             return null;
         }
     }
@@ -331,7 +320,7 @@ public class PropertyAssessmentController implements Initializable {
         long_text_field.clear();
         has_garage.setSelected(false);
         export_button.setDisable(true);
-        searchPropertyAssessments = new ArrayList<PropertyAssessment>();
+        searchPropertyAssessments = new ArrayList<>();
 
         // repopulates the table with the source data
         populateTable();
@@ -348,6 +337,10 @@ public class PropertyAssessmentController implements Initializable {
         }
     }
 
+    /**
+     * When the Export button is clicked it will launch this function that will export the search results to a scv file
+     * in the application folder called searchResults.csv
+     */
     @FXML
     protected void onExportClick() throws IOException {
 
@@ -355,7 +348,6 @@ public class PropertyAssessmentController implements Initializable {
         CSVWriter writer = new CSVWriter(new FileWriter(CscFilename));
         String[] str = {"Account Number", "Address", "Assessed Value", "Has Garage", "Location", "Neighbourhood", "Assessment Class"};
         writer.writeNext(str);
-
 
         for (PropertyAssessment prop : searchPropertyAssessments){
             str = new String[]{ Integer.toString(prop.getAccountNumber()),
@@ -376,12 +368,10 @@ public class PropertyAssessmentController implements Initializable {
      */
     @FXML
     protected void onSearchButtonClick(){
-
         // information popup that states that there is no data to search
 
         if (!hasDataRead){
             showPopup("Please select a source to search data");
-
             return;
         }
 
@@ -392,7 +382,6 @@ public class PropertyAssessmentController implements Initializable {
         // populates the tableView with the validates search parameters
         populateSearchResults(validatedInput);
         search_results.setText("There were: " + searchPropertyAssessments.size() + " Results");
-
     }
 
     /**
@@ -402,11 +391,8 @@ public class PropertyAssessmentController implements Initializable {
      * @param searchParameters validated sting array of user inputs
      */
     private void populateSearchResults(String[] searchParameters){
-
-
         //clears the current tableView
         tableViewItem.getItems().clear();
-
 
         Predicate<PropertyAssessment> predicateAccountNumber;
         Predicate<PropertyAssessment> predicateAddress;
@@ -514,12 +500,12 @@ public class PropertyAssessmentController implements Initializable {
         // saves the selection of the assessmentClassComboBox and saves it to teh sting array
         if (assessmentClassComboBox.getSelectionModel().isEmpty()){validatedInput[4]= "";}
         else {
-            if (assessmentClassComboBox.getValue().toString().equals("none")){
+            if (assessmentClassComboBox.getValue().equals("none")){
                 assessmentClassComboBox.getSelectionModel().clearSelection();
                 validatedInput[4]= "";
 
             } else {
-                validatedInput[4] = assessmentClassComboBox.getValue().toString();
+                validatedInput[4] = assessmentClassComboBox.getValue();
                 validatedInput[0] = "not null";
             }
         }
@@ -582,8 +568,6 @@ public class PropertyAssessmentController implements Initializable {
             return validatedInput;
         }
 
-
-
        // shows popup message if no search parameters were entered
        if (validatedInput[0].equals("empty search")) {
            validatedInput[0] = null;
@@ -595,6 +579,14 @@ public class PropertyAssessmentController implements Initializable {
     }
 
 
+    /**
+     * this function returns the distance between two points on a map
+     * @param lat1 latitude of point 1
+     * @param long1 longitude of point 1
+     * @param lat2 latitude of point 2
+     * @param long2 longitude of point 2
+     * @return the distance in KM
+     */
     public static double distanceBetweenTwoPoints(double lat1, double long1, double lat2, double long2) {
         double deltaLat = Math.toRadians(lat2 - lat1);
         double deltaLong = Math.toRadians(long2 - long1);
@@ -615,8 +607,4 @@ public class PropertyAssessmentController implements Initializable {
         alert.setHeaderText(popupMessage);
         alert.show();
     }
-
-
-
-
 }

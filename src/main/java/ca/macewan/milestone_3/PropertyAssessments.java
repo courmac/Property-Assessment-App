@@ -1,4 +1,4 @@
-/**
+/*
  * Student's Name: Orest Dushkevich and Courtney McNeilly
  * Milestone #2
  * CMPT 305 LAB X02L Fall 2021
@@ -11,60 +11,14 @@
 package ca.macewan.milestone_3;
 
 
-import com.opencsv.exceptions.CsvValidationException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 
 public class PropertyAssessments {
-    private ArrayList<PropertyAssessment> propertyList = new ArrayList<PropertyAssessment>();
+    private ArrayList<PropertyAssessment> propertyList = new ArrayList<>();
 
-
-    /**
-     * this method opens up a file and will convert each row into a PropertyAssessment and add it to the
-     * PropertyAssessments Object this method was called on
-     *
-     * untested since not part of the spec but in theory if called on a PropertyAssessments object that's not empty
-     * it should append the new data
-     *
-     * if an invalid filename is input will add nothing to the PropertyAssessments object and just return a print
-     * statement that says "could not open file".
-     *
-     * @param fileName  csv filename or filename path
-     * @throws IOException
-     * @throws CsvValidationException
-
-    public  void csvFileToPropertyAssessments(String fileName) throws Exception {
-
-        try {
-            // Create an object of fileReader
-            FileReader fileReader = new FileReader(fileName);
-            // Create an object of CSVReader
-            CSVReader csvReader = new CSVReader(fileReader);
-
-            // used for opencvs to carry over one row into a String array
-            String[] nextRecord;
-
-            //skips over headers
-            csvReader.readNext();
-
-            // iterates through csv file and appends each line to the Property ArrayList
-            while ((nextRecord = csvReader.readNext()) != null) {
-                propertyList.add( new PropertyAssessment(nextRecord));
-            }
-
-
-        } catch (Exception e) {
-
-            throw new Exception("Error: can't open file");
-
-        }
-    }
-
-     */
 
 
     /**
@@ -94,7 +48,7 @@ public class PropertyAssessments {
     /**
      * this method returns a PropertyAssessments object that's filled with PropertyAssessment objects that match neighbourhoodName
      * @param neighbourhoodName the name of the neighbourhood to search for
-     * @return
+     * @return the sorted PropertyAssessments object
      */
     public PropertyAssessments propertyAssessmentsByNeighbourhood(String neighbourhoodName){
 
@@ -137,8 +91,8 @@ public class PropertyAssessments {
 
     /**
      * this method returns a PropertyAssessments object that's filled with PropertyAssessment objects that match assessmentClassName
-     * @param assessmentClassName
-     * @return
+     * @param assessmentClassName the assessment class search parameter
+     * @return the sorted PropertyAssessments object
      */
     public PropertyAssessments propertyAssessmentsByAssessmentClass(String assessmentClassName){
 
@@ -196,10 +150,10 @@ public class PropertyAssessments {
         int medianValue;
         if (records % 2 == 1 ){
             // median will be indexed to be the middle number
-            medianValue = medianList.get( (int) records / 2);
+            medianValue = medianList.get(  records / 2);
         } else {
             //
-            medianValue = ( medianList.get( (int) records / 2) + medianList.get( (int) ((records / 2) -1))) / 2;
+            medianValue = ( medianList.get(  records / 2) + medianList.get(  ((records / 2) -1))) / 2;
         }
 
         int mean = (int) (sum/records);
@@ -226,7 +180,7 @@ public class PropertyAssessments {
 
     /**
      * combines two PropertyAssessments
-     * @param property
+     * @param property combines to propertyLists
      */
     public void combine(PropertyAssessments property){
         this.propertyList.addAll(property.propertyList);
