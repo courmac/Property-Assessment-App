@@ -1,3 +1,14 @@
+/**
+ * Student's Name: Orest Dushkevich and Courtney McNeilly
+ * Milestone #2
+ * CMPT 305 LAB X02L Fall 2021
+ * Instructor's Name: Indratmo Indratmo
+ *
+ * Purpose:
+ * This is the singleton class to hold the data between new windows
+ *
+ *
+ */
 package ca.macewan.milestone_3;
 
 public class PropertyHolder {

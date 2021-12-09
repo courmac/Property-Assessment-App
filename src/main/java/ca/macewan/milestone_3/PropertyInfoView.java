@@ -1,6 +1,16 @@
+/**
+ * Student's Name: Orest Dushkevich and Courtney McNeilly
+ * Milestone #2
+ * CMPT 305 LAB X02L Fall 2021
+ * Instructor's Name: Indratmo Indratmo
+ *
+ * Purpose:
+ * This Class is for the popup window with the individual stats
+ *
+ *
+ */
 package ca.macewan.milestone_3;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -48,18 +58,14 @@ public class PropertyInfoView implements Initializable {
 
         int nhID = propAssessments.findAccount(row.getAccount()).getNeighbourhood().getNeighbourhoodId();
 
-        NeighbourhoodQuery nhQuery = new NeighbourhoodQuery(nhID);
+        ApiNeighbourhoodQuery nhQuery = new ApiNeighbourhoodQuery(nhID);
 
-//        ApiPropertyAssessmentDAO calcs = new ApiPropertyAssessmentDAO();
-//        PropertyAssessments nhProps = calcs.getByNeighbourhood(nhQuery.getName());
-//        int[] data = nhProps.propertyAssessmentStats();
+
 
 
         // set views
         nhTitle.setText(row.getAddress());
-        nhNeighbourhood.setText(row.getNeighbourhood());
-//        nhDescription.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur risus dolor, auctor non diam tincidunt, malesuada maximus mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Proin varius elit eu elit tincidunt, sit amet gravida nunc tincidunt. Maecenas in augue ac massa accumsan posuere eu sed enim. Cras elit tortor, lacinia in ligula vitae, suscipit dapibus ipsum. Praesent ornare erat nec nisi consectetur, et ultrices enim pulvinar.");
-        nhDescription.setText(nhQuery.getNeighbourhoodDescription());
+        nhNeighbourhood.setText(row.getNeighbourhood());nhDescription.setText(nhQuery.getNeighbourhoodDescription());
         numCats.setText(nhQuery.getNumCats());
         numDogs.setText(nhQuery.getNumDogs());
         numPermits.setText(nhQuery.getBuildingPermits());
@@ -87,6 +93,8 @@ public class PropertyInfoView implements Initializable {
 //    String neighbourhoodDescription = neighbourhoodQuery.getNeighbourhoodDescription();
 //    int numCats = neighbourhoodQuery.getNumCats();
 //    int numDogs = neighbourhoodQuery.getNumDogs();
+
+
     /**
      * This function returns a description of the neighbourhood  uses neighbourhood_number as a parameter
      * @param neighbourhood_number the neighbourhood ID
@@ -114,45 +122,5 @@ public class PropertyInfoView implements Initializable {
             return "";
         }
     }
-//
-//    /**
-//     * this function returns how many dogs and cats there are
-//     * @param neighbourhood_number
-//     * @return
-//     */
-//    @Deprecated
-//    private int[] getNeighbourhoodPets(int neighbourhood_number){
-//        int[] pets = new int[2];
-//        String cats = "https://data.edmonton.ca/resource/5squ-mg4w.json?$where=&year=2021&pet_type=Cat&neighbourhood_id=" + neighbourhood_number;
-//        //String type = "+AND+neighbourhood_id=";
-//        String dogs = "https://data.edmonton.ca/resource/5squ-mg4w.json?$where=&year=2021&pet_type=Dog&neighbourhood_id="+ neighbourhood_number;
-//
-//
-//
-//        HttpClient client = HttpClient.newHttpClient();
-//        HttpRequest requestCats = HttpRequest.newBuilder().uri(URI.create(cats)).GET().build();
-//        HttpRequest requestDogs = HttpRequest.newBuilder().uri(URI.create(dogs)).GET().build();
-//
-//        try {
-//            HttpResponse<String> responseCats = client.send(requestCats, HttpResponse.BodyHandlers.ofString());
-//            String jsonStringCats =  responseCats.body();
-//
-//            HttpResponse<String> responseDogs = client.send(requestDogs, HttpResponse.BodyHandlers.ofString());
-//            String jsonStringDogs =  responseDogs.body();
-//
-//            JsonParser parser = new JsonParser();
-//            JsonArray arrayCats = parser.parse(jsonStringCats).getAsJsonArray();
-//            JsonArray arrayDogs = parser.parse(jsonStringDogs).getAsJsonArray();
-//
-//            pets[0] = arrayCats.size();
-//            pets[1] = arrayDogs.size();
-//
-//            return pets;
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 
 }

@@ -1,6 +1,6 @@
 /**
- * Student's Name: Orest Dushkevich
- * Milestone #2
+ * Student's Name: Orest Dushkevich and Courtney McNeilly
+ * Milestone #3
  * CMPT 305 LAB X02L Fall 2021
  * Instructor's Name: Indratmo Indratmo
  *
